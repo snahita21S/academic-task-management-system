@@ -69,3 +69,29 @@ Phase 1 focuses on:
   email: String,
   password: String (hashed)
 }
+
+### Project
+```js
+{
+name: String,
+description: String,
+userId: ObjectId (ref: user)
+}
+
+### Task
+```js
+{
+projectId : ObjectId (ref: Project),
+title: String,
+description: String,
+dueDate: Date
+}
+
+---
+
+## 📌 Why Add Them
+- **User schema** → shows how accounts are stored.  
+- **Project schema** → shows how projects are linked to users.  
+- **Task schema** → shows how tasks are linked to projects.  
+
+Together, they clearly document the backend design and make your README complete. Professors/reviewers expect to see this because it matches your API endpoints.
