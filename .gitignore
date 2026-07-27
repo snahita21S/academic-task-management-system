@@ -141,3 +141,12 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Ignore dependencies
+node_modules
+
+# Ignore environment variables
+.env
+
+# Ignore build output
+client/build
