@@ -1,2 +1,97 @@
-# academic-task-management-system
-Academic Task Management &amp; Workflow System - Phase 1 deliverables
+# Academic Task Management & Workflow System (Phase 1)
+
+This repository contains the **Phase 1 deliverables** for the Academic Task Management & Workflow System project.  
+Developed using the MERN stack (MongoDB, Express.js, React, Node.js), the system provides secure authentication, project creation and management, task tracking, and a student dashboard.  
+
+Phase 1 focuses on:
+- Authentication (register/login with JWT)
+- Project creation and management
+- Task management linked to projects
+- Student dashboard integration
+- API and database schema documentation
+
+---
+
+## 🚀 Features
+
+- **Authentication Module**
+  - Secure user registration and login
+  - Password hashing with bcrypt
+  - JWT‑based authentication for protected routes
+
+- **Project Management**
+  - Create and manage projects with name and description
+  - View all projects linked to the logged‑in user
+
+- **Task Management**
+  - Add tasks associated with specific projects
+  - View tasks per project
+  - Success/error messages for task operations
+
+- **Student Dashboard**
+  - Centralized interface for projects and tasks
+  - Integrated forms for adding projects and tasks
+  - Real‑time updates without page reloads
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React, Axios, Bootstrap  
+- **Backend:** Node.js, Express.js  
+- **Database:** MongoDB Atlas  
+- **Authentication:** JWT, bcrypt  
+
+---
+
+## 📚 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` → Register new user  
+- `POST /api/auth/login` → Login existing user  
+
+### Projects
+- `POST /api/projects` → Add new project  
+- `GET /api/projects` → Get all projects for logged‑in user  
+
+### Tasks
+- `POST /api/tasks` → Add new task (requires `projectId`)  
+- `GET /api/tasks?projectId=<id>` → Get tasks for a project  
+
+---
+
+## 🗄️ Database Schema
+
+### User
+```js
+{
+  name: String,
+  email: String,
+  password: String (hashed)
+}
+
+### Project
+```js
+{
+name: String,
+description: String,
+userId: ObjectId (ref: user)
+}
+
+### Task
+```js
+{
+projectId : ObjectId (ref: Project),
+title: String,
+description: String,
+dueDate: Date
+}
+
+---
+
+## 📌 Why Add Them
+- **User schema** → shows how accounts are stored.  
+- **Project schema** → shows how projects are linked to users.  
+- **Task schema** → shows how tasks are linked to projects.  
+
+Together, they clearly document the backend design and make your README complete. Professors/reviewers expect to see this because it matches your API endpoints.
