@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function Register() {
+  const [name, setName] = useState("");   // NEW state for name
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -9,10 +10,12 @@ function Register() {
     e.preventDefault();
     try {
       await axios.post("http://localhost:5000/api/auth/register", {
+        name,       // include name
         email,
         password,
       });
       alert("User registered successfully! You can now login.");
+      setName("");   // reset name
       setEmail("");
       setPassword("");
     } catch (err) {
@@ -25,6 +28,17 @@ function Register() {
     <div className="container mt-5">
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label>Name</label>
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+
         <div className="mb-3">
           <label>Email</label>
           <input

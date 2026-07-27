@@ -1,46 +1,48 @@
 import React, { useState } from "react";
-import ProjectList from "./ProjectList.js";
 import ProjectForm from "./ProjectForm.js";
-import TaskList from "./TaskList.js";
+import ProjectList from "./ProjectList.js";
 import TaskForm from "./TaskForm.js";
+import TaskList from "./TaskList.js";
 
-function Dashboard({ token }) {
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [refreshTasks, setRefreshTasks] = useState(false);
-  const [refreshProjects, setRefreshProjects] = useState(false);
+function Dashboard() {
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  const handleProjectAdded = (newProject) => {
+    // Add new project to state immediately
+    setProjects([...projects, newProject]);
+    setSelectedProject(newProject._id); // auto-select the new project
+  };
+
+  const handleTaskAdded = (newTask) => {
+    // Optional: refresh tasks or handle task state here
+    console.log("Task added:", newTask);
+  };
 
   return (
-    <div className="container-fluid">
-      <div className="row">
-        {/* Sidebar for Projects */}
-        <div className="col-lg-3 bg-light p-3">
-          <ProjectForm onProjectCreated={() => setRefreshProjects(!refreshProjects)} />
-          <ProjectList 
-            refresh={refreshProjects}
-            onSelectProject={(id) => setSelectedProjectId(id)} 
-          />
-        </div>
+    <div className="container mt-5">
+      <h2>Dashboard</h2>
 
-        {/* Main area for tasks */}
-        <div className="col-lg-9 p-3">
-          {selectedProjectId ? (
-            <>
-              <TaskForm
-                token={token}
-                projectId={selectedProjectId}
-                onTaskCreated={() => setRefreshTasks(!refreshTasks)}
-              />
-              <TaskList
-                token={token}
-                projectId={selectedProjectId}
-                refresh={refreshTasks}
-              />
-            </>
-          ) : (
-            <p>Select a project to view tasks.</p>
-          )}
-        </div>
-      </div>
+      {/* Add new project */}
+      <ProjectForm onProjectAdded={handleProjectAdded} />
+
+      {/* Show all projects */}
+      {projects.length === 0 ? (
+        <p>No projects found. Add one!</p>
+      ) : (
+        <ProjectList
+          refresh={false}
+          onSelectProject={setSelectedProject}
+        />
+      )}
+
+      {/* Show tasks only when a project is selected */}
+      {selectedProject && (
+        <>
+          <TaskForm projectId={selectedProject} onTaskAdded={handleTaskAdded} />
+          <TaskList projectId={selectedProject} />
+        </>
+      )}
     </div>
   );
 }

@@ -9,24 +9,30 @@ function Login({ onLogin }) {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Make the request and store the response in res
-    const res = await axios.post("/api/auth/login", { email, password });
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
 
-    const token = res.data.token;
-    const user = res.data.user;
+      const token = res.data.token;
+      const user = res.data.user;
 
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
 
-    onLogin(token, user);
-    navigate("/dashboard");
+      if (onLogin) {
+        onLogin(token, user);
+      }
+
+      navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err.response?.data || err.message);
       setError(err.response?.data?.msg || "Login failed. Check credentials");
     }
-
   };
 
   return (

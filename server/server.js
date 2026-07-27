@@ -1,10 +1,11 @@
-const taskRoutes = require('./routes/task');
-const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/project');
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require('cors');
+import authRoutes from "./routes/auth.js";
+import taskRoutes from "./routes/task.js";
+import projectRoutes from "./routes/project.js";
+
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
 
 
 dotenv.config();
@@ -16,7 +17,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 
-// MongoDB Connection (no extra options needed in Mongoose v7+)
+// MongoDB Connection 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("✅ MongoDB Connected"))
     .catch((err) => console.error("❌ MongoDB Connection Error:", err));

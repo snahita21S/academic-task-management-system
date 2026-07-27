@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import Project from "../models/project.js";   // note the .js extension
+import auth from "../middleware/Auth.js";     // also add .js
+
 const router = express.Router();
-const Project = require("../models/project");
-const auth = require("../middleware/Auth");
 
 // CREATE Project
 router.post("/", auth, async (req, res) => {
@@ -54,4 +55,4 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

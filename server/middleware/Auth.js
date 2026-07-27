@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 function auth(req, res, next) {
   const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -16,4 +16,4 @@ function auth(req, res, next) {
   }
 }
 
-module.exports = auth;
+export default auth;
