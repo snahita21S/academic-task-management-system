@@ -87,6 +87,14 @@ description: String,
 dueDate: Date
 }
 
+
+## 📌 Why Add Them
+- **User schema** → shows how accounts are stored.  
+- **Project schema** → shows how projects are linked to users.  
+- **Task schema** → shows how tasks are linked to projects.  
+
+Together, they clearly document the backend design and make your README complete. Professors/reviewers expect to see this because it matches your API endpoints.
+
 ---
 
 # Academic Task Management System – Phase 2
@@ -118,13 +126,3 @@ Phase‑2 introduces **real‑time notifications** for task operations.
 
 ### 1. Empty Notification Panel
 Shows the default state when no notifications exist.
-
-
----
-
-## 📌 Why Add Them
-- **User schema** → shows how accounts are stored.  
-- **Project schema** → shows how projects are linked to users.  
-- **Task schema** → shows how tasks are linked to projects.  
-
-Together, they clearly document the backend design and make your README complete. Professors/reviewers expect to see this because it matches your API endpoints.
