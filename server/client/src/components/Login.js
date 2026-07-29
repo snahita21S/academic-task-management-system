@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function Login({ onLogin }) {
+function Login({ setToken, setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -16,32 +15,28 @@ function Login({ onLogin }) {
         password,
       });
 
-      const token = res.data.token;
-      const user = res.data.user;
+      // Save token + user in localStorage
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      localStorage.setItem("token", token);
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-      }
+      // Update state in App.js
+      setToken(res.data.token);
+      setUser(res.data.user);
 
-      if (onLogin) {
-        onLogin(token, user);
-      }
-
+      // Redirect to dashboard
       navigate("/dashboard");
     } catch (err) {
-      console.error("Login error:", err.response?.data || err.message);
-      setError(err.response?.data?.msg || "Login failed. Check credentials");
+      console.error("Login failed:", err.response?.data || err.message);
+      alert("Login failed. Please check your credentials.");
     }
   };
 
   return (
-    <div className="container mt-5">
+    <div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="email"
-          className="form-control mb-2"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -49,17 +44,13 @@ function Login({ onLogin }) {
         />
         <input
           type="password"
-          className="form-control mb-2"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" className="btn btn-primary w-100">
-          Login
-        </button>
+        <button type="submit">Login</button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }

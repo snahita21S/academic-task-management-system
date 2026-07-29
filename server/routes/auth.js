@@ -1,81 +1,107 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";   // notice the .js extension
+import User from "../models/User.js";
 
 const router = express.Router();
 
+// Generate tokens
+const generateTokens = (user) => {
+  const accessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET || "secretKey",
+    { expiresIn: "1h" }
+  );
 
-// LOGIN route
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_REFRESH_SECRET || "refreshSecret",
+    { expiresIn: "7d" }
+  );
 
-    // check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: "User not found" });
-    }
+  return { accessToken, refreshToken };
+};
 
-    // check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials" });
-    }
-
-    // generate token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    // return token + user info
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (err) {
-    console.error("Login error:", err.message);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
-
-// REGISTER route
+// ✅ Register
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // check if user already exists
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    // hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // save new user (include name!)
+    // Create new user
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    // generate token
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+    res.json({
+      msg: "User registered successfully",
+      user: { id: newUser._id, name: newUser.name, email: newUser.email }
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+});
+
+// ✅ Login
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ msg: "Invalid credentials" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+
+    const { accessToken, refreshToken } = generateTokens(user);
+
+    // Send refresh token in HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     res.json({
-      token,
-      user: { id: newUser._id, name: newUser.name, email: newUser.email },
+      msg: "Login successful",
+      token: accessToken,
+      user: { id: user._id, name: user.name, email: user.email }
     });
   } catch (err) {
-    console.error("Register error:", err.message);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: "Server error", error: err.message });
   }
+});
+
+// ✅ Refresh
+router.post("/refresh", (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.status(401).json({ msg: "No refresh token provided" });
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || "refreshSecret");
+    const accessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.JWT_SECRET || "secretKey",
+      { expiresIn: "1h" }
+    );
+    res.json({ token: accessToken });
+  } catch (err) {
+    res.status(401).json({ msg: "Invalid refresh token" });
+  }
+});
+
+// ✅ Logout
+router.post("/logout", (req, res) => {
+  res.clearCookie("refreshToken");
+  res.json({ msg: "Logged out successfully" });
 });
 
 export default router;

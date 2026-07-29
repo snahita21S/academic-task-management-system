@@ -1,58 +1,54 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api.js";
 
 function TaskForm({ projectId, onTaskAdded }) {
-  const [title, setTitle] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [taskName, setTaskName] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleAddTask = async (e) => {
     e.preventDefault();
+
+    if (!taskName.trim()) return;
+
     try {
-      const token = localStorage.getItem("token");
+      const res = await api.post("/tasks", {
+        title: taskName,
+        status: "Pending", // ✅ default status
+        projectId: projectId,
+      });
 
-      const res = await axios.post(
-        "http://localhost:5000/api/tasks",
-        { projectId, title },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (onTaskAdded) {
-        onTaskAdded(res.data);
-      }
-
-      // Reset form + show success message
-      setTitle("");
-      setError("");
-      setSuccess("Task added successfully!");
-
-      // Hide success message after 3 seconds
-      setTimeout(() => setSuccess(""), 3000);
+      onTaskAdded(res.data);
+      setTaskName("");
     } catch (err) {
       console.error("Error adding task:", err.response?.data || err.message);
-      setError(err.response?.data?.msg || "Failed to add task");
-      setSuccess("");
+      alert("Could not add task. Check backend.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-3">
-      <h4>Add Task</h4>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
+    <form onSubmit={handleAddTask} style={{ marginTop: "10px" }}>
       <input
         type="text"
-        placeholder="Task Title"
-        className="form-control mb-2"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
+        placeholder="New task name"
+        value={taskName}
+        onChange={(e) => setTaskName(e.target.value)}
+        style={{
+          padding: "8px",
+          borderRadius: "6px",
+          border: "1px solid #ccc",
+          marginRight: "10px"
+        }}
       />
-
-      <button type="submit" className="btn btn-primary w-100">
+      <button
+        type="submit"
+        style={{
+          backgroundColor: "#4CAF50", // soft green
+          color: "white",
+          border: "none",
+          padding: "8px 16px",
+          borderRadius: "6px",
+          cursor: "pointer"
+        }}
+      >
         Add Task
       </button>
     </form>

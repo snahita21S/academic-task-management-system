@@ -1,57 +1,39 @@
 import express from "express";
-import Project from "../models/project.js";   // note the .js extension
-import auth from "../middleware/Auth.js";     // also add .js
+import Project from "../models/Project.js";
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
-// CREATE Project
-router.post("/", auth, async (req, res) => {
+// Create project
+router.post("/", authMiddleware, async (req, res) => {
   try {
     const { name } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ msg: "Project name is required" });
-    }
-
-    const newProject = new Project({
-      name,
-      user: req.user, // attach logged-in user
-    });
-
-    await newProject.save();
-    res.json(newProject);
+    const project = new Project({ name, userId: req.user.id });
+    await project.save();
+    res.json(project);
   } catch (err) {
-    console.error("Error creating project:", err);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ error: "Failed to create project" });
   }
 });
 
-// GET Projects for logged-in user
-router.get("/", auth, async (req, res) => {
+// Get all projects for logged-in user (with tasks populated)
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const projects = await Project.find({ user: req.user });
+    const projects = await Project.find({ userId: req.user.id }).populate("tasks");
     res.json(projects);
   } catch (err) {
-    console.error("Error fetching projects:", err);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ error: "Failed to fetch projects" });
   }
 });
 
-// DELETE Project
-router.delete("/:id", auth, async (req, res) => {
+// Delete project
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
-
-    if (!project) return res.status(404).json({ msg: "Project not found" });
-    if (project.user.toString() !== req.user) {
-      return res.status(401).json({ msg: "Not authorized" });
-    }
-
-    await project.remove();
-    res.json({ msg: "Project deleted" });
+    const project = await Project.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+    res.json({ success: true, message: "Project deleted" });
   } catch (err) {
-    console.error("Error deleting project:", err);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ error: "Failed to delete project" });
   }
 });
 

@@ -1,29 +1,25 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login.js";
-import Register from "./components/Register.js";
 import Dashboard from "./components/Dashboard.js";
 import ProtectedRoute from "./components/ProtectedRoute.js";
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(
-    localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
+    JSON.parse(localStorage.getItem("user") || "null")
   );
 
-  const handleLogin = (token, user) => {
-    setToken(token);
-    setUser(user);
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-  };
-
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route path="/register" element={<Register />} />
+        {/* Login route */}
+        <Route
+          path="/login"
+          element={<Login setToken={setToken} setUser={setUser} />}
+        />
+
+        {/* Dashboard route (protected) */}
         <Route
           path="/dashboard"
           element={
@@ -32,8 +28,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Default route: redirect "/" to "/login" */}
+        <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
