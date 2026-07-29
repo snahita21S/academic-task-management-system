@@ -87,7 +87,7 @@ description: String,
 dueDate: Date
 }
 
-
+---
 
 # Academic Task Management System – Phase 2
 
