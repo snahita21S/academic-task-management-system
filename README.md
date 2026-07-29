@@ -87,6 +87,39 @@ description: String,
 dueDate: Date
 }
 
+
+
+# Academic Task Management System – Phase 2
+
+## 📌 Overview
+This project is a full‑stack MERN application designed to manage academic tasks.  
+Phase‑2 introduces **real‑time notifications** for task operations.
+
+## 🚀 Features Implemented in Phase 2
+- ✅ Notification panel in frontend (React).  
+- ✅ Real‑time notifications using **Socket.IO**.  
+- ✅ Notifications triggered on:
+  - Task creation
+  - Task update
+  - Task deletion
+- ✅ Empty state handling: shows *“No notifications yet”* when none exist.  
+
+## 🛠️ Tech Stack
+- **Frontend**: React, Axios, Socket.IO client  
+- **Backend**: Node.js, Express, MongoDB, Socket.IO  
+- **Database**: MongoDB Atlas  
+
+## ⚙️ How to Run Locally
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/<your-username>/academic-task-management-system.git
+
+## 📷 Demo Screenshots
+
+### 1. Empty Notification Panel
+Shows the default state when no notifications exist.
+
+
 ---
 
 ## 📌 Why Add Them
